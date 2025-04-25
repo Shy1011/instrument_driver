@@ -1,0 +1,99 @@
+import time
+
+import pyvisa
+from instrument_drivers.parent_classes.Device import  *
+class MULTIMEMTER(INSTRUMENT):
+    def __init__(self, pInstruID):
+        super().__init__(pInstruID)
+        """ Voltage """
+        self._last_voltage_range = None  # 缓存上一次的 range
+        self._last_voltage_resolution = None  # 缓存上一次的 resolution
+
+        self._last_current_range = None
+        self._last_current_resolution = None
+
+    def dc_voltage_measure(self, range="10", resolution="0.0001") -> float:
+        """
+        测量直流电压（自动跳过重复参数配置）
+        Args:
+            range: 量程（可选 "0.1", "1", "10", "100", "1000", "AUTO"）
+            resolution: 分辨率（可选 "0.001", "0.0001", "0.00001", "AUTO"）
+        Returns:
+            测量结果（浮点数）
+        """
+        # 参数验证
+        assert range in {"0.1", "1", "10", "100", "1000", "AUTO"}, "Invalid range"
+        assert resolution in {"0.001", "0.0001", "0.00001", "AUTO"}, "Invalid resolution"
+
+        # 检查参数是否变化
+        if range == self._last_voltage_range and resolution == self._last_voltage_resolution:
+            # 参数未变化，直接测量
+            res = self.instrument.query("MEASure:VOLTage:DC?")
+        else:
+            # 参数变化，更新配置并测量
+            if range == "AUTO" and resolution == "AUTO":
+                res = self.instrument.query("MEASure:VOLTage:DC?")
+            else:
+                res = self.instrument.query(f"MEASure:VOLTage:DC? {range},{resolution}")
+
+            # 更新缓存
+            self._last_voltage_range = range
+            self._last_voltage_resolution = resolution
+
+        return float(res)
+
+    def dc_current_measure(self, range="3", resolution="0.0001") -> float:
+        """
+        测量直流电流（自动跳过重复参数配置）
+
+        Args:
+            range: 电流量程（可选 "0.1", "1", "3", "10", "100", "1000", "AUTO"）
+            resolution: 分辨率（可选 "0.001", "0.0001", "0.00001", "AUTO"）
+
+        Returns:
+            测量结果（浮点数）
+        """
+        # 参数验证
+        assert range in {"0.1", "1", "3", "10", "100", "1000", "AUTO"}, "请选择正确的电流量程"
+        assert resolution in {"0.001", "0.0001", "0.00001", "AUTO"}, "请选择正确的分辨率"
+
+        # 检查参数是否变化
+        if range == self._last_current_range and resolution == self._last_current_resolution:
+            # 参数未变化，直接测量
+            res = self.instrument.query("MEASure:CURRent:DC?")
+        else:
+            # 参数有变化，更新配置
+            if range == "AUTO" and resolution == "AUTO":
+                res = self.instrument.query("MEASure:CURRent:DC?")
+            else:
+                res = self.instrument.query(f"MEASure:CURRent:DC? {range},{resolution}")
+
+            # 更新缓存
+            self._last_current_range = range
+            self._last_current_resolution = resolution
+
+        return float(res)
+
+    def fre_measure(self):
+        res = self.instrument.query(f"MEASure:FREQuency?")
+
+        return float(res)
+
+    def buzzer_ring(self,times):
+        """
+        Makes buzzer beep once.
+        :return: none
+        """
+        for i  in range (times) :
+            self.instrument.write("SYST:BEEP:IMM")
+            time.sleep(0.5)
+        
+
+
+if __name__ == "__main__":
+    dmm = MULTIMEMTER("USB0::0x2A8D::0x1301::MY60099169::INSTR")
+
+    print(dmm.dc_voltage_measure("AUTO","AUTO"))
+    print(dmm.dc_current_measure("AUTO","AUTO"))
+    print(dmm.fre_measure())
+    dmm.buzzer_ring(2)
