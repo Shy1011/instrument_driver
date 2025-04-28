@@ -1,6 +1,6 @@
 import pyvisa
 from colorama import init, Fore,Style
-from instrument_drivers.parent_classes.Device import  *
+from instrument_drivers.base.Device import  *
 class Power(INSTRUMENT):
     def __init__(self, pInstruID):
         super().__init__(pInstruID)

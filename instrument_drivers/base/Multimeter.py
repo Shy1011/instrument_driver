@@ -1,7 +1,7 @@
 import time
 
 import pyvisa
-from instrument_drivers.parent_classes.Device import  *
+from instrument_drivers.base.Device import  *
 class MULTIMEMTER(INSTRUMENT):
     def __init__(self, pInstruID):
         super().__init__(pInstruID)

@@ -1,6 +1,6 @@
 import time
 
-from instrument_drivers.parent_classes.Power import *
+from instrument_drivers.base.Power import *
 
 class POWER_RIGOL_DP831A(Power):
     def __init__(self,pInstruID):

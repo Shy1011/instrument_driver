@@ -1,4 +1,4 @@
-from instrument_drivers.parent_classes.SMU import *
+from instrument_drivers.base.SMU import *
 
 class Smu_Keithley_2460(SMU):
     def __init__(self,device_id):
