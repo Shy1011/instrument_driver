@@ -52,5 +52,6 @@ class INSTRUMENT():
         return result
 
 
+
 if __name__ == "__main__":
     dmm = INSTRUMENT("USB0::0x2A8D::0x1301::MY60099169::INSTR")

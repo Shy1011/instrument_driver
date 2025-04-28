@@ -35,16 +35,23 @@ class SMU(INSTRUMENT):
         # 电压源配置
         self.instrument.write(":SOUR:FUNC VOLT")
         self.instrument.write(f":SOUR:VOLT {v_out}")
-        self.instrument.write(f":SOUR:VOLT:ILIM {i_limit}")
 
         # 量程设置（三目运算符简化）
         v_range_cmd = ":SOUR:VOLT:RANG:AUTO ON" if isinstance(v_range, str) else f":SOUR:VOLT:RANG {v_range}"
         i_range_cmd = ":SENS:CURR:RANG:AUTO ON" if isinstance(i_range, str) else f":SENS:CURR:RANG {i_range}"
 
+        self.instrument.write(f":SOUR:VOLT:ILIM {i_limit}")
         self.instrument.write(v_range_cmd)
         self.instrument.write(":SENS:FUNC 'CURR'")
         self.instrument.write(i_range_cmd)
         self.instrument.write(f":SENS:CURR:NPLC {nplc}")
+
+        self.instrument.write(f":SOUR:VOLT:ILIM {i_limit}")
+        self.instrument.write(v_range_cmd)
+        self.instrument.write(":SENS:FUNC 'CURR'")
+        self.instrument.write(i_range_cmd)
+        self.instrument.write(f":SENS:CURR:NPLC {nplc}")
+
 
     def force_cur_sens_volt_init(
             self,
@@ -113,6 +120,9 @@ class SMU(INSTRUMENT):
 
     def force_voltage_set(self,voltage : float = 0.0):
         self.instrument.write(f":SOUR:VOLT {voltage}")
+
+    def enter_local_mode(self):
+        self.instrument.write(":TRIG:CONT RESTart")  # make SMU return to local & enter continious mode
 
 if __name__ == "__main__" :
     """

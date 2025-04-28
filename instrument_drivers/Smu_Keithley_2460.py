@@ -33,5 +33,44 @@ class Smu_Keithley_2460(SMU):
 if __name__ == "__main__" :
     smu = SMU("USB0::0x05E6::0x2460::04624797::INSTR")
 
-    smu.force_volt_sens_cur_init(0.1,2)
-    smu.force_cur_sens_volt_init(0.1, 5)
+    # smu.force_volt_sens_cur_init(1.85,0.1,"auto",0.1,1) # 1.85V Irange 100mA
+    # smu.output_switch("ON")
+    smu.force_cur_sens_volt_init(0, 10)
+
+    smu.enter_local_mode()
+    # smu.force_cur_sens_volt_init(0.1, 5)
+    while True :
+        data = input("Please Enter")
+        if  data == "1.62" :
+            smu.force_volt_sens_cur_init(1.62, 0.1, "auto", 0.1, 1)  # 1.85V Irange 100mA
+            smu.output_switch("ON")
+            smu.enter_local_mode()
+            pass
+        elif  data == "1.8" :
+            smu.force_volt_sens_cur_init(1.8, 0.1, "auto", 0.1, 1)  # 1.85V Irange 100mA
+            smu.output_switch("ON")
+            smu.enter_local_mode()
+            pass
+        elif data == "1.98":
+            smu.force_volt_sens_cur_init(1.98, 0.1, "auto", 0.1, 1)  # 1.85V Irange 100mA
+            smu.output_switch("ON")
+            smu.enter_local_mode()
+        # elif data == "1.7":
+        #     smu.force_volt_sens_cur_init(1.7, 0.1, "auto", 0.1, 1)  # 1.85V Irange 100mA
+        #     smu.output_switch("ON")
+        #     smu.enter_local_mode()
+        elif data == "1.7":
+            smu.force_volt_sens_cur_init(1.7, 0.008, "auto", 0.01, 1)  # 1.85V Irange 100mA
+            smu.output_switch("ON")
+            smu.enter_local_mode()
+            input("Enter High Current Mode")
+            smu.force_volt_sens_cur_init(1.7, 0.1, "auto", 0.1, 1)  # 1.85V Irange 100mA
+            smu.output_switch("ON")
+            smu.enter_local_mode()
+        elif data == "off" or data == "OFF":
+            smu.force_cur_sens_volt_init(0, 10) # off
+            smu.output_switch("ON")
+            smu.enter_local_mode()
+        else:
+            print("None,input incorrect")
+
