@@ -34,72 +34,74 @@ class SMU(INSTRUMENT):
         """
         # 电压源配置
         self.instrument.write(":SOUR:FUNC VOLT")
-        self.instrument.write(f":SOUR:VOLT {v_out}")
+
 
         # 量程设置（三目运算符简化）
         v_range_cmd = ":SOUR:VOLT:RANG:AUTO ON" if isinstance(v_range, str) else f":SOUR:VOLT:RANG {v_range}"
         i_range_cmd = ":SENS:CURR:RANG:AUTO ON" if isinstance(i_range, str) else f":SENS:CURR:RANG {i_range}"
 
-        self.instrument.write(f":SOUR:VOLT:ILIM {i_limit}")
-        self.instrument.write(v_range_cmd)
-        self.instrument.write(":SENS:FUNC 'CURR'")
-        self.instrument.write(i_range_cmd)
-        self.instrument.write(f":SENS:CURR:NPLC {nplc}")
 
-        self.instrument.write(f":SOUR:VOLT:ILIM {i_limit}")
+
         self.instrument.write(v_range_cmd)
         self.instrument.write(":SENS:FUNC 'CURR'")
         self.instrument.write(i_range_cmd)
         self.instrument.write(f":SENS:CURR:NPLC {nplc}")
+        self.instrument.write(f":SOUR:VOLT {v_out}")
+        self.instrument.write(f":SOUR:VOLT:ILIM {i_limit}")
+
 
 
     def force_cur_sens_volt_init(
             self,
-            pIout: float | str = 0.1,
-            pVlimt: float | str = 5,
-            pIrange: float | str = "auto",
-            pVrange: float | str = "auto",
-            pNplc: float | str = 1,
+            i_out: float | str = 0.1,
+            v_limit: float | str = 5,
+            i_range: float | str = "auto",
+            v_range: float | str = "auto",
+            nplc: float | str = 1,
     ) -> None:
         """
         配置 SMU（源测量单元）为 ​**强制电流模式（Force Current）​**，并设置 ​**电压测量（Sense Voltage）​**。
 
         Args:
-            pIout (float | str): 强制输出的电流值（单位：A），例如 `0.1` 或 `"100e-3"`。
-            pVlimt (float | str): 强制电流模式下的电压限制（单位：V），例如 `10.0` 或 `"10"`。
-            pIrange (float | str): 电流量程（数值或 `"AUTO"`），例如 `1.0` 或 `"AUTO"`。
-            pVrange (float | str): 电压测量量程（数值或 `"AUTO"`），例如 `10.0` 或 `"AUTO"`。
-            pNplc (float | str): 电压测量的积分时间（NPLC），例如 `1` 或 `"10"`。
+            i_out (float | str): 强制输出的电流值（单位：A），例如 `0.1` 或 `"100e-3"`。
+            v_limit (float | str): 强制电流模式下的电压限制（单位：V），例如 `10.0` 或 `"10"`。
+            i_range (float | str): 电流量程（数值或 `"AUTO"`），例如 `1.0` 或 `"AUTO"`。
+            v_range (float | str): 电压测量量程（数值或 `"AUTO"`），例如 `10.0` 或 `"AUTO"`。
+            nplc (float | str): 电压测量的积分时间（NPLC），例如 `1` 或 `"10"`。
 
         Returns:
             None
         """
         # --- 源代码配置 ---
         self.instrument.write(":SOUR:FUNC CURR")  # 设置 SMU 源模式为电流输出
-        self.instrument.write(f":SOUR:CURR:LEV {pIout}")  # 设置强制输出电流值
-        self.instrument.write(f":SOUR:CURR:VLIM {pVlimt}")  # 设置电流模式下的电压限制
+
 
         # 设置电流量程（自动或固定值）
-        if isinstance(pIrange, str) and pIrange.upper() == "AUTO":
+        if isinstance(i_range, str) and i_range.upper() == "AUTO":
             self.instrument.write(":SOUR:CURR:RANG:AUTO ON")
         else:
-            self.instrument.write(f":SOUR:CURR:RANG {pIrange}")
+            self.instrument.write(f":SOUR:CURR:RANG {i_range}")
 
         # --- 测量配置 ---
         self.instrument.write(":SENS:FUNC 'VOLT'")  # 设置 SMU 测量模式为电压
 
         # 设置电压量程（自动或固定值）
-        if isinstance(pVrange, str) and pVrange.upper() == "AUTO":
+        if isinstance(v_range, str) and v_range.upper() == "AUTO":
             self.instrument.write(":SENS:VOLT:RANG:AUTO ON")
         else:
-            self.instrument.write(f":SENS:VOLT:RANG {pVrange}")
+            self.instrument.write(f":SENS:VOLT:RANG {v_range}")
 
-        self.instrument.write(f":SENS:VOLT:NPLC {pNplc}")  # 设置电压测量的积分时间（NPLC）
+        self.instrument.write(f":SENS:VOLT:NPLC {nplc}")  # 设置电压测量的积分时间（NPLC）
+        self.instrument.write(f":SOUR:CURR:LEV {i_out}")  # 设置强制输出电流值
+        self.instrument.write(f":SOUR:CURR:VLIM {v_limit}")  # 设置电流模式下的电压限制
 
-    def enable_4wire_mode(self,switch : str = "OFF") -> None:
+    def enable_4wire_mode(self,switch : bool = False) -> None:
         """启用 4-Wire 测量模式（不改变其他配置）"""
-        self.instrument.write(f":SYST:RSEN {switch}")  # 开启远程传感（4-Wire）
-        # print("4-Wire 模式已开启")
+        if switch:
+            self.instrument.write(f":SYST:RSEN ON")  # 开启远程传感（4-Wire）
+        else :
+            self.instrument.write(f":SYST:RSEN OFF")  # （2-Wire）
+
 
     def current_measure(self) -> float :
         meas_i = self.instrument.query('MEAS:CURR?')
@@ -111,8 +113,11 @@ class SMU(INSTRUMENT):
 
         return float(meas_v)
 
-    def output_switch(self,switch : str = "OFF") -> None:
-        self.instrument.write(f":OUTP {switch}")
+    def enable_output(self, switch : bool = False) -> None:
+        if switch:
+            self.instrument.write(f":OUTP ON")
+        else:
+            self.instrument.write(f":OUTP OFF")
 
 
     def force_current_set(self,current : float = 0.0):
@@ -128,22 +133,22 @@ if __name__ == "__main__" :
     """
     Take SMU 2450 as an example
     """
-    smu = SMU("USB0::0x05E6::0x2450::04576516::INSTR")
+    smu = SMU("USB0::0x05E6::0x2460::04576516::INSTR")
 
 
     smu.force_volt_sens_cur_init(0,0.1,v_range="auto",i_range="auto",nplc=1)
     smu.force_voltage_set(0.5)
-    smu.output_switch("ON")
+    smu.enable_output(True)
 
     time.sleep(5)
 
-    smu.force_cur_sens_volt_init(0.1,5,pIrange="auto",pVrange="auto",pNplc=1)
+    smu.force_cur_sens_volt_init(0.1, 5, i_range="auto", v_range="auto", nplc=1)
     smu.force_current_set(0.5)
-    smu.output_switch("ON")
+    smu.enable_output(True)
 
     time.sleep(5)
 
-    smu.enable_4wire_mode("OFF")
+    smu.enable_4wire_mode(False)
     print(smu.current_measure())
     print(smu.voltage_measure())
-    smu.output_switch("OFF")
+    smu.enable_output(False)

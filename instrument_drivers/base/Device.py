@@ -51,6 +51,11 @@ class INSTRUMENT():
 
         return result
 
+    def print_hints(self,sentence):
+        print("\n--------------------------")
+        print(sentence)
+        print("\n--------------------------")
+
 
 
 if __name__ == "__main__":
