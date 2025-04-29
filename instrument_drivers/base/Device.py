@@ -13,7 +13,7 @@ class INSTRUMENT():
         try:
             self.instrument = pyvisa.ResourceManager().open_resource(pInstruID)  # open instrument through instruID
             self.instrument.read_termination = "\n"
-            self.instrument.timeout = 100000  # set instrument timeout
+            self.instrument.timeout = 5000  # set instrument timeout
         except Exception as e:
             self.hint(f"Instrument ID {pInstruID} is not found")
             self.hint(f"Check your instrument connection or use another ID.")

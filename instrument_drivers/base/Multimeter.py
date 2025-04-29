@@ -87,13 +87,12 @@ class MULTIMEMTER(INSTRUMENT):
         for i  in range (times) :
             self.instrument.write("SYST:BEEP:IMM")
             time.sleep(0.5)
-        
+
 
 
 if __name__ == "__main__":
-    dmm = MULTIMEMTER("USB0::0x2A8D::0x1301::MY60099169::INSTR")
+    dmm = MULTIMEMTER("USB0::0x05E6::0x6500::04644817::INSTR")
 
     print(dmm.dc_voltage_measure("AUTO","AUTO"))
     print(dmm.dc_current_measure("AUTO","AUTO"))
     print(dmm.fre_measure())
-    dmm.buzzer_ring(2)
