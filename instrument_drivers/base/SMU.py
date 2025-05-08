@@ -6,6 +6,8 @@ from instrument_drivers.base.Device import  *
 class SMU(INSTRUMENT):
     def __init__(self, pInstruID):
         super().__init__(pInstruID)
+        self.v_range = {0.2,2,7,10,20,100,"auto"}
+        self.i_range = {0.00001,0.0001,0.001,0.01,0.1,1, "auto"}
 
     def force_volt_sens_cur_init(self, v_out : float|str = 0, i_limit : float | str = 1, v_range : float | str ="auto", i_range : float | str ="auto", nplc=1) -> None:
         """
@@ -32,6 +34,9 @@ class SMU(INSTRUMENT):
             i_range (float/str): 电流量程值(float)或"auto"(默认)
             nplc (float): 积分周期数(默认1)
         """
+        assert v_range in self.v_range,"Paramemter v_range illegal"
+        assert i_range in self.i_range, "Paramemter i_range illegal"
+
         # 电压源配置
         self.instrument.write(":SOUR:FUNC VOLT")
 
@@ -72,6 +77,9 @@ class SMU(INSTRUMENT):
         Returns:
             None
         """
+        assert v_range in self.v_range,"Paramemter v_range illegal"
+        assert i_range in self.i_range, "Paramemter i_range illegal"
+
         # --- 源代码配置 ---
         self.instrument.write(":SOUR:FUNC CURR")  # 设置 SMU 源模式为电流输出
 
