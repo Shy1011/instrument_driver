@@ -2,9 +2,16 @@ import pyvisa
 from txt import *
 import time
 from datetime import datetime
+import pathlib
+
+"""
+This will scan all the instruments connected to the computer and save their ID's in a txt file.
+"""
+
 if __name__ == "__main__" :
     start = time.time()
-    save_path = rf"files"  # 替换为你的实际路径
+    save_path = rf"files"  # will have to create a folder named "files" in the same directory as the script, and a txt file will be saved there
+    pathlib.Path(save_path).mkdir(exist_ok=True)
 
     now = datetime.now()
     custom_format = now.strftime("%Y_%m_%d_ %H_%M_%S")

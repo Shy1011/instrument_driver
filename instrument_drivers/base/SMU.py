@@ -1,8 +1,7 @@
 import time
-
-import pyvisa
-from colorama import init, Fore,Style
 from instrument_drivers.base.Device import  *
+"""This is the base class for the Keithley SourceMeter."""
+
 class SMU(INSTRUMENT):
     def __init__(self, pInstruID):
         super().__init__(pInstruID)

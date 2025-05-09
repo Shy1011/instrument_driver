@@ -1,7 +1,9 @@
 import time
-
-import pyvisa
 from instrument_drivers.base.Device import  *
+
+"""
+This is a base class for multimeter instruments.
+"""
 class MULTIMEMTER(INSTRUMENT):
     def __init__(self, pInstruID):
         super().__init__(pInstruID)
@@ -77,6 +79,16 @@ class MULTIMEMTER(INSTRUMENT):
     def fre_measure(self):
         res = self.instrument.query(f"MEASure:FREQuency?")
 
+        return float(res)
+
+    def result_query(self):
+        """
+        查询测量结果
+        :return: 测量结果（浮点数）
+        you can set your instruments mannually then use this fuction to get query result..
+        This function will not change any setting you have already made in your instrument.
+        """
+        res = self.instrument.query("read?")
         return float(res)
 
     def buzzer_ring(self,times):

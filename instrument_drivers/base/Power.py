@@ -1,6 +1,8 @@
-import pyvisa
-from colorama import init, Fore,Style
 from instrument_drivers.base.Device import  *
+
+"""
+This is the base class for the power supply.
+"""
 class Power(INSTRUMENT):
     def __init__(self, pInstruID):
         super().__init__(pInstruID)

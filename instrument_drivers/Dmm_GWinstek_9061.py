@@ -1,5 +1,7 @@
 from instrument_drivers.base.Multimeter import *
-
+"""
+This is the driver for GWINSTEK 9061 digital multimeter.
+"""
 class Dmm_GWINSTEK_9061(MULTIMEMTER):
     def __init__(self,device_id):
         super().__init__(device_id)

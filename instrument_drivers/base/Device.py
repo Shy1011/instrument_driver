@@ -1,6 +1,8 @@
 import pyvisa
 from colorama import init, Fore, Style
-
+"""
+This is the base class for all instrument drivers.
+"""
 
 class INSTRUMENT():
     def __init__(self, pInstruID):
