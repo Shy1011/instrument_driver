@@ -8,7 +8,7 @@ class Smu_Keithley_2450(SMU):
 
 
 if __name__ == "__main__" :
-    smu = SMU("USB0::0x05E6::0x2450::04576516::INSTR")
+    smu = Smu_Keithley_2450("USB0::0x05E6::0x2450::04576516::INSTR")
 
     smu.force_volt_sens_cur_init(0.1,1)
     smu.enable_output(True)
