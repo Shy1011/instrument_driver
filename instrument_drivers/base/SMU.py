@@ -1,8 +1,12 @@
 import time
 from instrument_drivers.base.Device import  *
-"""This is the base class for the Keithley SourceMeter."""
+"""
+This is the base class for the Keithley SourceMeter.
 
-class SMU(INSTRUMENT):
+Develop a generic function for SMU
+"""
+
+class Smu(Instrument):
     def __init__(self, pInstruID):
         super().__init__(pInstruID)
         self.v_range = {0.2,2,7,10,20,100,"auto"}
@@ -140,7 +144,7 @@ if __name__ == "__main__" :
     """
     Take SMU 2450 as an example
     """
-    smu = SMU("USB0::0x05E6::0x2460::04576516::INSTR")
+    smu = Smu("USB0::0x05E6::0x2460::04576516::INSTR")
 
 
     smu.force_volt_sens_cur_init(0,0.1,v_range="auto",i_range="auto",nplc=1)

@@ -3,8 +3,10 @@ from instrument_drivers.base.Device import  *
 
 """
 This is a base class for multimeter instruments.
+
+Develop a generic function for Multimeter
 """
-class MULTIMEMTER(INSTRUMENT):
+class Multimeter(Instrument):
     def __init__(self, pInstruID):
         super().__init__(pInstruID)
         """ Voltage """
@@ -103,7 +105,7 @@ class MULTIMEMTER(INSTRUMENT):
 
 
 if __name__ == "__main__":
-    dmm = MULTIMEMTER("USB0::0x05E6::0x6500::04644817::INSTR")
+    dmm = Multimeter("USB0::0x05E6::0x6500::04644817::INSTR")
 
     print(dmm.dc_voltage_measure("AUTO","AUTO"))
     print(dmm.dc_current_measure("AUTO","AUTO"))

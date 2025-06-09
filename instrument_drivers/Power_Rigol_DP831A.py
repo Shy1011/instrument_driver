@@ -2,7 +2,7 @@ import time
 
 from instrument_drivers.base.Power import *
 
-class POWER_RIGOL_DP831A(Power):
+class PowerRigolDP831A(Power):
     def __init__(self,pInstruID):
         super().__init__(pInstruID)
 
@@ -52,11 +52,10 @@ class POWER_RIGOL_DP831A(Power):
 
 if __name__ == "__main__":
 
-    power = POWER_RIGOL_DP831A("USB0::0x1AB1::0x0E11::DP8A242400223::INSTR")
+    power = PowerRigolDP831A("USB0::0x1AB1::0x0E11::DP8A242400223::INSTR")
     power.set_volta_current(3,2,1)
     power.turn_on_off(3,"ON")
     print(power.read_voltage(3))
     print(power.read_current(3))
     print(power.read_power(3))
 
-    power.beeper_switch("ON")

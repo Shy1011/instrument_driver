@@ -2,8 +2,10 @@ from instrument_drivers.base.Device import  *
 
 """
 This is the base class for the power supply.
+
+Develop a generic function for Power
 """
-class Power(INSTRUMENT):
+class Power(Instrument):
     def __init__(self, pInstruID):
         super().__init__(pInstruID)
 
