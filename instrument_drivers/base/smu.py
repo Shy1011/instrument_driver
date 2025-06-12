@@ -1,10 +1,30 @@
 import time
 from instrument_drivers.base.device import  *
+from dataclasses import dataclass
 """
 This is the base class for the Keithley SourceMeter.
 
 Develop a generic function for SMU
 """
+
+@dataclass
+class ForceVoltSenseCurConfig:
+    v_out: float | str = 0  # 电压源输出值（单位：V）
+    i_limit: float | str = 1  # 电压源模式下的电流限值（单位：A）
+    v_range: float | str = "auto"  # 电压源量程，数值为具体量程，字符串表示自动量程
+    i_range: float | str = "auto"  # 电流测量量程，数值为具体量程，字符串表示自动量程
+    nplc: float = 1  # 电流测量的积分时间（NPLC值）
+
+
+@dataclass
+class ForceCurSenseVoltConfig:
+    """强制电流模式配置参数"""
+    i_out: float | str = 0.1      # 强制输出的电流值（单位：A）
+    v_limit: float | str = 5      # 电流模式下的电压限制（单位：V）
+    i_range: float | str = "auto" # 电流量程（数值或"auto"）
+    v_range: float | str = "auto" # 电压测量量程（数值或"auto"）
+    nplc: float | str = 1         # 电压测量的积分时间（NPLC）
+
 
 class Smu(Instrument):
     def __init__(self, pInstruID):
@@ -12,100 +32,64 @@ class Smu(Instrument):
         self.v_range = {0.2,2,7,10,20,100,"auto"}
         self.i_range = {0.00001,0.0001,0.001,0.01,0.1,1, "auto"}
 
-    def force_volt_sens_cur_init(self, v_out : float|str = 0, i_limit : float | str = 1, v_range : float | str ="auto", i_range : float | str ="auto", nplc=1) -> None:
+    def force_volt_sens_cur_init(self, config: ForceVoltSenseCurConfig) -> None:
         """
         配置设备为电压源输出、电流测量模式（Force Voltage, Sense Current）
 
         参数：
-            pVout (float/str): 电压源输出值（单位：V）
-
-            pIlimt (float): 电压源模式下的电流限值（单位：A）
-            pVrange (float/str): 电压源量程，数值为具体量程，字符串表示自动量程
-            pIrange (float/str): 电流测量量程，数值为具体量程，字符串表示自动量程
-            pNplc (float): 电流测量的积分时间（NPLC值）
-
-        返回：
-            None
+            config: 包含所有配置参数的数据类对象
         """
+        assert config.v_range in self.v_range, "Parameter v_range illegal"
+        assert config.i_range in self.i_range, "Parameter i_range illegal"
 
-        """
-        配置电压源输出+电流测量模式（Force Voltage, Sense Current）
-    
-        参数：
-            v_out (float): 输出电压值(V)
-            i_limit (float): 电流限值(A)
-            v_range (float/str): 电压量程值(float)或"auto"(默认)
-            i_range (float/str): 电流量程值(float)或"auto"(默认)
-            nplc (float): 积分周期数(默认1)
-        """
-        assert v_range in self.v_range,"Paramemter v_range illegal"
-        assert i_range in self.i_range, "Paramemter i_range illegal"
-
-        # 电压源配置
         self.instrument.write(":SOUR:FUNC VOLT")
 
-
-        # 量程设置（三目运算符简化）
-        v_range_cmd = ":SOUR:VOLT:RANG:AUTO ON" if isinstance(v_range, str) else f":SOUR:VOLT:RANG {v_range}"
-        i_range_cmd = ":SENS:CURR:RANG:AUTO ON" if isinstance(i_range, str) else f":SENS:CURR:RANG {i_range}"
-
-
+        v_range_cmd = ":SOUR:VOLT:RANG:AUTO ON" if isinstance(config.v_range,
+                                                              str) else f":SOUR:VOLT:RANG {config.v_range}"
+        i_range_cmd = ":SENS:CURR:RANG:AUTO ON" if isinstance(config.i_range,
+                                                              str) else f":SENS:CURR:RANG {config.i_range}"
 
         self.instrument.write(v_range_cmd)
         self.instrument.write(":SENS:FUNC 'CURR'")
         self.instrument.write(i_range_cmd)
-        self.instrument.write(f":SENS:CURR:NPLC {nplc}")
-        self.instrument.write(f":SOUR:VOLT {v_out}")
-        self.instrument.write(f":SOUR:VOLT:ILIM {i_limit}")
+        self.instrument.write(f":SENS:CURR:NPLC {config.nplc}")
+        self.instrument.write(f":SOUR:VOLT {config.v_out}")
+        self.instrument.write(f":SOUR:VOLT:ILIM {config.i_limit}")
 
+    @dataclass
+    class ForceCurSenseVoltConfig:
+        """强制电流模式配置参数"""
+        i_out: float | str = 0.1  # 强制输出的电流值（单位：A）
+        v_limit: float | str = 5  # 电流模式下的电压限制（单位：V）
+        i_range: float | str = "auto"  # 电流量程（数值或"auto"）
+        v_range: float | str = "auto"  # 电压测量量程（数值或"auto"）
+        nplc: float | str = 1  # 电压测量的积分时间（NPLC）
 
-
-    def force_cur_sens_volt_init(
-            self,
-            i_out: float | str = 0.1,
-            v_limit: float | str = 5,
-            i_range: float | str = "auto",
-            v_range: float | str = "auto",
-            nplc: float | str = 1,
-    ) -> None:
+    def force_cur_sens_volt_init(self, config: ForceCurSenseVoltConfig) -> None:
         """
-        配置 SMU（源测量单元）为 ​**强制电流模式（Force Current）​**，并设置 ​**电压测量（Sense Voltage）​**。
+        配置设备为电流源输出、电压测量模式（Force Current, Sense Voltage）
 
-        Args:
-            i_out (float | str): 强制输出的电流值（单位：A），例如 `0.1` 或 `"100e-3"`。
-            v_limit (float | str): 强制电流模式下的电压限制（单位：V），例如 `10.0` 或 `"10"`。
-            i_range (float | str): 电流量程（数值或 `"AUTO"`），例如 `1.0` 或 `"AUTO"`。
-            v_range (float | str): 电压测量量程（数值或 `"AUTO"`），例如 `10.0` 或 `"AUTO"`。
-            nplc (float | str): 电压测量的积分时间（NPLC），例如 `1` 或 `"10"`。
-
-        Returns:
-            None
+        参数：
+            config: 包含所有配置参数的数据类对象
         """
-        assert v_range in self.v_range,"Paramemter v_range illegal"
-        assert i_range in self.i_range, "Paramemter i_range illegal"
+        assert config.v_range in self.v_range, "Parameter v_range illegal"
+        assert config.i_range in self.i_range, "Parameter i_range illegal"
 
-        # --- 源代码配置 ---
-        self.instrument.write(":SOUR:FUNC CURR")  # 设置 SMU 源模式为电流输出
+        # 电流源配置
+        self.instrument.write(":SOUR:FUNC CURR")
 
 
-        # 设置电流量程（自动或固定值）
-        if isinstance(i_range, str) and i_range.upper() == "AUTO":
-            self.instrument.write(":SOUR:CURR:RANG:AUTO ON")
-        else:
-            self.instrument.write(f":SOUR:CURR:RANG {i_range}")
+        i_range_cmd = ":SOUR:CURR:RANG:AUTO ON" if isinstance(config.i_range,
+                                                              str) else f":SOUR:CURR:RANG {config.i_range}"
+        v_range_cmd = ":SENS:VOLT:RANG:AUTO ON" if isinstance(config.v_range,
+                                                              str) else f":SENS:VOLT:RANG {config.v_range}"
 
-        # --- 测量配置 ---
-        self.instrument.write(":SENS:FUNC 'VOLT'")  # 设置 SMU 测量模式为电压
-
-        # 设置电压量程（自动或固定值）
-        if isinstance(v_range, str) and v_range.upper() == "AUTO":
-            self.instrument.write(":SENS:VOLT:RANG:AUTO ON")
-        else:
-            self.instrument.write(f":SENS:VOLT:RANG {v_range}")
-
-        self.instrument.write(f":SENS:VOLT:NPLC {nplc}")  # 设置电压测量的积分时间（NPLC）
-        self.instrument.write(f":SOUR:CURR:LEV {i_out}")  # 设置强制输出电流值
-        self.instrument.write(f":SOUR:CURR:VLIM {v_limit}")  # 设置电流模式下的电压限制
+        self.instrument.write(i_range_cmd)
+        self.instrument.write(":SENS:FUNC 'VOLT'")
+        self.instrument.write(v_range_cmd)
+        self.instrument.write(f":SENS:VOLT:NPLC {config.nplc}")
+        self.instrument.write(f":SOUR:CURR:LEV {config.i_out}")
+        self.instrument.write(f":SOUR:CURR:VLIM {config.v_limit}")
 
     def enable_4wire_mode(self,switch : bool = False) -> None:
         """启用 4-Wire 测量模式（不改变其他配置）"""
@@ -145,16 +129,22 @@ if __name__ == "__main__" :
     """
     Take SMU 2450 as an example
     """
-    smu = Smu("USB0::0x05E6::0x2460::04576516::INSTR")
+    default1 = ForceVoltSenseCurConfig()  # setup for SMU1
+    default2 = ForceCurSenseVoltConfig()  # setup for SMU2
+
+    default1.v_out = 0.2
+    default2.i_out = 0.1
+
+    smu = Smu("USB0::0x05E6::0x2460::04624797::INSTR")
 
 
-    smu.force_volt_sens_cur_init(0,0.1,v_range="auto",i_range="auto",nplc=1)
+    smu.force_volt_sens_cur_init(default1)
     smu.force_voltage_set(0.5)
     smu.enable_output(True)
 
     time.sleep(5)
 
-    smu.force_cur_sens_volt_init(0.1, 5, i_range="auto", v_range="auto", nplc=1)
+    smu.force_cur_sens_volt_init(default2)
     smu.force_current_set(0.5)
     smu.enable_output(True)
 
