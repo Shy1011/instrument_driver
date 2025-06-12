@@ -1,4 +1,4 @@
-from instrument_drivers.base.Multimeter import *
+from instrument_drivers.base.multimeter import *
 
 class DmmKeithley6500(Multimeter):
     def __init__(self,device_id):

@@ -1,4 +1,4 @@
-from instrument_drivers.base.Multimeter import *
+from instrument_drivers.base.multimeter import *
 
 class DmmKeysight34461A(Multimeter):
     def __init__(self,device_id):

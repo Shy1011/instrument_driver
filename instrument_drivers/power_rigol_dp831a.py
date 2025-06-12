@@ -1,6 +1,6 @@
 import time
 
-from instrument_drivers.base.Power import *
+from instrument_drivers.base.power import *
 
 class PowerRigolDP831A(Power):
     def __init__(self,pInstruID):
@@ -15,6 +15,7 @@ class PowerRigolDP831A(Power):
         :param switch: "ON"/""OFF
         :return: none
         """
+        assert range in {"1", "2","3"}, "DP821A Only has three Channels"
         self.instrument.write(f"OUTP CH{ch},{switch}")
         time.sleep(1)
 
@@ -24,6 +25,7 @@ class PowerRigolDP831A(Power):
         :param ch: 1 / 2 / 3
         :return: float
         """
+        assert range in {"1", "2", "3"}, "DP821A Only has three Channels"
         voltage = self.instrument.query(f":MEASure:VOLTage? CH{ch}")
 
         return float(voltage)
@@ -34,6 +36,7 @@ class PowerRigolDP831A(Power):
         :param ch: 1 / 2 / 3
         :return: float
         """
+        assert range in {"1", "2", "3"}, "DP821A Only has three Channels"
         current = self.instrument.query(f"MEASure:CURRent? CH{ch}")
 
         return float(current)
@@ -45,6 +48,7 @@ class PowerRigolDP831A(Power):
         :param ch: 1 / 2 /3
         :return: float
         """
+        assert range in {"1", "2", "3"}, "DP821A Only has three Channels"
         power = self.instrument.query(f"MEASure:POWer? CH{ch}")
 
         return float(power)

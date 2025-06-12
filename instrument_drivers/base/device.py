@@ -25,7 +25,7 @@ class Instrument():
         self.instrument.write("*RST")
 
     def identify_instrument(self):
-        "Reset the Device"
+        ""
         self.instrument.query("*IDN?")
 
     def hint(self, tips):

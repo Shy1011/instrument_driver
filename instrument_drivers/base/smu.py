@@ -1,5 +1,5 @@
 import time
-from instrument_drivers.base.Device import  *
+from instrument_drivers.base.device import  *
 """
 This is the base class for the Keithley SourceMeter.
 
@@ -18,6 +18,7 @@ class Smu(Instrument):
 
         参数：
             pVout (float/str): 电压源输出值（单位：V）
+
             pIlimt (float): 电压源模式下的电流限值（单位：A）
             pVrange (float/str): 电压源量程，数值为具体量程，字符串表示自动量程
             pIrange (float/str): 电流测量量程，数值为具体量程，字符串表示自动量程

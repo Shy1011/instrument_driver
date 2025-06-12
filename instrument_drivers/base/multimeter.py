@@ -1,5 +1,5 @@
 import time
-from instrument_drivers.base.Device import  *
+from instrument_drivers.base.device import  *
 
 """
 This is a base class for multimeter instruments.

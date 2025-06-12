@@ -1,4 +1,4 @@
-from instrument_drivers.base.Multimeter import *
+from instrument_drivers.base.multimeter import *
 """
 This is the driver for GWINSTEK 9061 digital multimeter.
 """

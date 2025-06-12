@@ -1,4 +1,4 @@
-from instrument_drivers.base.Device import  *
+from instrument_drivers.base.device import  *
 
 """
 This is the base class for the power supply.

@@ -1,4 +1,4 @@
-from instrument_drivers.base.Power import *
+from instrument_drivers.base.power import *
 import time
 class PowerGwinstek6030(Power) :
     def __init__(self,pInstruID):
