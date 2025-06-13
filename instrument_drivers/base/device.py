@@ -24,9 +24,27 @@ class Instrument():
         "Reset the Device"
         self.instrument.write("*RST")
 
+    def clear(self):
+        "Reset the Device"
+        "This command clears the event registers and queues."
+        self.instrument.write("*CLS")
+
+    def clear_get_event_status(self):
+        "This command reads and clears the contents of the Standard Event Status Register."
+        data = self.instrument.query("*CLS")
+        return data
+
     def identify_instrument(self):
-        ""
+        "This command retrieves the identification string of the instrument."
         self.instrument.query("*IDN?")
+
+    def trig(self):
+        "This command generates a trigger event from a remote command interface."
+        self.instrument.write("*TRG")
+
+    def wait(self):
+        "This command waits for all pending operations to complete."
+        self.instrument.write("*WAI")
 
     def hint(self, tips):
         init(autoreset=True)
