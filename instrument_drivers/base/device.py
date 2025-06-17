@@ -63,12 +63,22 @@ class Instrument():
 
     def instrument_query(self, command):
         """
+        Query the instrument error queue.
+        If the error message contains "No error", exit the loop.
+        Otherwise, print the error message along with the
+        most recent executed command (self.recent_cmd)
+        for debugging purposes.
 
         :param command:
         :return: str
         """
-        result = self.instrument.query(command)  # Reset the instrument
 
+        while m := self.instrument.query(':SYSTem:ERR?'):
+            if "No error" in m:
+                break
+            print(m, f'recent: {self.recent_cmd}')
+        result = self.instrument.query(command)  # Reset the instrument
+        self.recent_cmd = f'query {command} recv {result}'
         return result
 
     def print_hints(self,sentence):
