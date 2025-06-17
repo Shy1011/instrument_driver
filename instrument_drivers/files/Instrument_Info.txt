@@ -13,3 +13,14 @@ USB0::0x05E6::0x2460::04624797::INSTR                       KEITHLEY INSTRUMENTS
 USB0::0x1AB1::0x0E11::DP8A242400223::INSTR                  RIGOL TECHNOLOGIES,DP831A,DP8A242400223,00.01.16            
 USB0::0x2A8D::0x1301::MY60065834::INSTR                     Keysight Technologies,34461A,MY60065834,A.03.03-03.15-03.03-00.52-04-03
 USB0::0x05E6::0x2460::04624797::INSTR                       KEITHLEY INSTRUMENTS,MODEL 2460,04624797,1.7.12b            
+
+-------------------------------------------------2025_06_14_ 13_56_56-----------------------------------------------------
+USB0::0x1AB1::0x0E11::DP8A242400223::INSTR                  RIGOL TECHNOLOGIES,DP831A,DP8A242400223,00.01.16            
+USB0::0x2A8D::0x1301::MY60065834::INSTR                     Keysight Technologies,34461A,MY60065834,A.03.03-03.15-03.03-00.52-04-03
+USB0::0x05E6::0x2460::04624797::INSTR                       KEITHLEY INSTRUMENTS,MODEL 2460,04624797,1.7.12b            
+
+-------------------------------------------------2025_06_17_ 16_01_05-----------------------------------------------------
+USB0::0x1AB1::0x0E11::DP8A242400223::INSTR                  RIGOL TECHNOLOGIES,DP831A,DP8A242400223,00.01.16            
+USB0::0x2A8D::0x1301::MY60065834::INSTR                     Keysight Technologies,34461A,MY60065834,A.03.03-03.15-03.03-00.52-04-03
+USB0::0x2A8D::0x1301::MY60099215::INSTR                     Keysight Technologies,34461A,MY60099215,A.03.03-03.15-03.03-00.52-04-03
+USB0::0x05E6::0x2460::04624797::INSTR                       KEITHLEY INSTRUMENTS,MODEL 2460,04624797,1.7.12b            
