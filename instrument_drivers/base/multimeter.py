@@ -1,6 +1,6 @@
 import time
 from instrument_drivers.base.device import  *
-
+import instrument_drivers
 """
 This is a base class for multimeter instruments.
 
@@ -15,6 +15,15 @@ class Multimeter(Instrument):
 
         self._last_current_range = None
         self._last_current_resolution = None
+
+    def validate_nplc(self, nplc):
+        # 判断当前对象是否为 Keithley6500 型号
+        if isinstance(self, instrument_drivers.dmm_keithley_6500):
+            # Keithley6500 支持 0.0005 到 12 之间的任意值
+            return 0.0005 <= nplc <= 12
+        else:
+            # 其他型号仅支持特定离散值
+            return nplc in {0.02, 0.2, 1, 10, 100}
 
     def dc_voltage_measure(self, range="10", resolution="0.0001") -> float:
         """

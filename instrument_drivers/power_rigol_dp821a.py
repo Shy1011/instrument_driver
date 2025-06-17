@@ -15,7 +15,7 @@ class PowerRigolDP821A(Power):
         :param switch: "ON"/""OFF
         :return: none
         """
-        assert range in {"1","2"}, "DP821A Only has two Channels"
+        assert ch in {"1", "2",1,2}, "DP821A Only has two Channels"
         self.instrument.write(f"OUTP CH{ch},{switch}")
         time.sleep(1)
 
@@ -25,7 +25,7 @@ class PowerRigolDP821A(Power):
         :param ch: 1 / 2
         :return: float
         """
-        assert range in {"1", "2"}, "DP821A Only has two Channels"
+        assert ch in {"1", "2",1,2}, "DP821A Only has two Channels"
         voltage = self.instrument.query(f":MEASure:VOLTage? CH{ch}")
 
         return float(voltage)
@@ -36,7 +36,7 @@ class PowerRigolDP821A(Power):
         :param ch: 1 / 2
         :return: float
         """
-        assert range in {"1", "2"}, "DP821A Only has two Channels"
+        assert ch in {"1", "2",1,2}, "DP821A Only has two Channels"
         current = self.instrument.query(f"MEASure:CURRent? CH{ch}")
 
         return float(current)
@@ -48,7 +48,7 @@ class PowerRigolDP821A(Power):
         :param ch: 1 / 2
         :return: float
         """
-        assert range in {"1", "2"}, "DP821A Only has two Channels"
+        assert ch in {"1", "2",1,2}, "DP821A Only has two Channels"
         power = self.instrument.query(f"MEASure:POWer? CH{ch}")
 
         return float(power)
