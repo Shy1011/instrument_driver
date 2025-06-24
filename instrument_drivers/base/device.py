@@ -24,13 +24,14 @@ class Instrument():
         "Reset the Device"
         self.instrument.write("*RST")
 
-    def clear(self):
-        "Reset the Device"
-        "This command clears the event registers and queues."
-        self.instrument.write("*CLS")
+    # def clear(self):
+    #     "Reset the Device"
+    #     "This command clears the event registers and queues."
+    #     self.instrument.write("*CLS")
 
     def clear_get_event_status(self):
-        "This command reads and clears the contents of the Standard Event Status Register."
+        " This command reads and clears the contents of the Standard Event Status Register."
+        " Sometimes this command can also be used to clear the errors in the error queue."
         data = self.instrument.query("*CLS")
         return data
 
@@ -53,13 +54,38 @@ class Instrument():
         print(Fore.RED + tips)
         print(Fore.RED + "!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
-    def instrument_write(self, command):
-        """
+    def instrument_write(self, command: str) -> bool:
+        """发送SCPI命令到仪器并处理错误队列
 
-        :param command:  str
-        :return:
+        在发送新命令前，会先检查并清空仪器的错误队列。
+        任何非"No error"的错误信息都会被打印出来。
+
+        Args:
+            command: 要发送的SCPI命令字符串
+
+        Returns:
+            bool: 命令是否成功发送(True=成功, False=存在未处理错误)
+
+        Raises:
+            InstrumentError: 当仪器通信失败时抛出
         """
-        self.instrument.write(command)  # Reset the instrument
+        try:
+            # 清空错误队列
+            while True:
+                error_msg = self.instrument.query(':SYSTem:ERR?')   # Get the error message and clear the error queue
+                if "No error" in error_msg:
+                    break
+                print(f"Instrument Error: {error_msg} (Last command: {self.recent_cmd})")
+
+            # 记录并发送命令
+            self.recent_cmd = f'write: {command}'
+            self.instrument.write(command)
+            return True
+
+        except Exception as e:
+            error_msg = f"Failed to send command '{command}': {str(e)}"
+            self.recent_cmd = f'failed: {command}'
+            print(error_msg)
 
     def instrument_query(self, command):
         """

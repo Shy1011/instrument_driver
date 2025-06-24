@@ -5,8 +5,7 @@ This is the driver for GWINSTEK 9061 digital multimeter.
 class DmmGwinstek9061(Multimeter):
     def __init__(self,device_id):
         super().__init__(device_id)
-        self.instrument.write("SENS:AVER:STAT OFF")  # cancel the digital filter
-
+        self.instrument.write("SENS:AVER:STAT OFF")  # cancel the digital filter only for GW 9061. otherwise the filter will cause an unstable reading
 
 
 

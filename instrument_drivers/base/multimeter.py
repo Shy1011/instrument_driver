@@ -41,13 +41,13 @@ class Multimeter(Instrument):
         # 检查参数是否变化
         if range == self._last_voltage_range and resolution == self._last_voltage_resolution:
             # 参数未变化，直接测量
-            res = self.instrument.query("MEASure:VOLTage:DC?")
+            res = self.instrument_query("MEASure:VOLTage:DC?")
         else:
             # 参数变化，更新配置并测量
             if range == "AUTO" and resolution == "AUTO":
-                res = self.instrument.query("MEASure:VOLTage:DC?")
+                res = self.instrument_query("MEASure:VOLTage:DC?")
             else:
-                res = self.instrument.query(f"MEASure:VOLTage:DC? {range},{resolution}")
+                res = self.instrument_query(f"MEASure:VOLTage:DC? {range},{resolution}")
 
             # 更新缓存
             self._last_voltage_range = range
@@ -73,13 +73,13 @@ class Multimeter(Instrument):
         # 检查参数是否变化
         if range == self._last_current_range and resolution == self._last_current_resolution:
             # 参数未变化，直接测量
-            res = self.instrument.query("MEASure:CURRent:DC?")
+            res = self.instrument_query("MEASure:CURRent:DC?")
         else:
             # 参数有变化，更新配置
             if range == "AUTO" and resolution == "AUTO":
-                res = self.instrument.query("MEASure:CURRent:DC?")
+                res = self.instrument_query("MEASure:CURRent:DC?")
             else:
-                res = self.instrument.query(f"MEASure:CURRent:DC? {range},{resolution}")
+                res = self.instrument_query(f"MEASure:CURRent:DC? {range},{resolution}")
 
             # 更新缓存
             self._last_current_range = range
@@ -88,7 +88,7 @@ class Multimeter(Instrument):
         return float(res)
 
     def fre_measure(self):
-        res = self.instrument.query(f"MEASure:FREQuency?")
+        res = self.instrument_query(f"MEASure:FREQuency?")
 
         return float(res)
 
@@ -99,7 +99,7 @@ class Multimeter(Instrument):
         you can set your instruments mannually then use this fuction to get query result..
         This function will not change any setting you have already made in your instrument.
         """
-        res = self.instrument.query("read?")
+        res = self.instrument_query("read?")
         return float(res)
 
     def buzzer_ring(self,times):

@@ -42,28 +42,28 @@ class Smu(Instrument):
         assert config.v_range in self.v_range, "Parameter v_range illegal"
         assert config.i_range in self.i_range, "Parameter i_range illegal"
 
-        self.instrument.write(":SOUR:FUNC VOLT")
+        self.instrument_write(":SOUR:FUNC VOLT")
 
         v_range_cmd = ":SOUR:VOLT:RANG:AUTO ON" if isinstance(config.v_range,
                                                               str) else f":SOUR:VOLT:RANG {config.v_range}"
         i_range_cmd = ":SENS:CURR:RANG:AUTO ON" if isinstance(config.i_range,
                                                               str) else f":SENS:CURR:RANG {config.i_range}"
 
-        self.instrument.write(v_range_cmd)
-        self.instrument.write(":SENS:FUNC 'CURR'")
-        self.instrument.write(i_range_cmd)
-        self.instrument.write(f":SENS:CURR:NPLC {config.nplc}")
-        self.instrument.write(f":SOUR:VOLT {config.v_out}")
-        self.instrument.write(f":SOUR:VOLT:ILIM {config.i_limit}")
+        self.instrument_write(v_range_cmd)
+        self.instrument_write(":SENS:FUNC 'CURR'")
+        self.instrument_write(i_range_cmd)
+        self.instrument_write(f":SENS:CURR:NPLC {config.nplc}")
+        self.instrument_write(f":SOUR:VOLT {config.v_out}")
+        self.instrument_write(f":SOUR:VOLT:ILIM {config.i_limit}")
 
-    @dataclass
-    class ForceCurSenseVoltConfig:
-        """强制电流模式配置参数"""
-        i_out: float | str = 0.1  # 强制输出的电流值（单位：A）
-        v_limit: float | str = 5  # 电流模式下的电压限制（单位：V）
-        i_range: float | str = "auto"  # 电流量程（数值或"auto"）
-        v_range: float | str = "auto"  # 电压测量量程（数值或"auto"）
-        nplc: float | str = 1  # 电压测量的积分时间（NPLC）
+    def enable_high_cap(self, switch: bool = False) -> None:
+        """"
+        启动高电容模式.适合容性负载
+        """
+        if switch:
+            self.instrument_write(f':SOURce:CURRent:HIGH:CAPacitance ON')
+        else:
+            self.instrument_write(f':SOURce:CURRent:HIGH:CAPacitance OFF')
 
     def force_cur_sens_volt_init(self, config: ForceCurSenseVoltConfig) -> None:
         """
@@ -76,7 +76,7 @@ class Smu(Instrument):
         assert config.i_range in self.i_range, "Parameter i_range illegal"
 
         # 电流源配置
-        self.instrument.write(":SOUR:FUNC CURR")
+        self.instrument_write(":SOUR:FUNC CURR")
 
 
         i_range_cmd = ":SOUR:CURR:RANG:AUTO ON" if isinstance(config.i_range,
@@ -84,46 +84,77 @@ class Smu(Instrument):
         v_range_cmd = ":SENS:VOLT:RANG:AUTO ON" if isinstance(config.v_range,
                                                               str) else f":SENS:VOLT:RANG {config.v_range}"
 
-        self.instrument.write(i_range_cmd)
-        self.instrument.write(":SENS:FUNC 'VOLT'")
-        self.instrument.write(v_range_cmd)
-        self.instrument.write(f":SENS:VOLT:NPLC {config.nplc}")
-        self.instrument.write(f":SOUR:CURR:LEV {config.i_out}")
-        self.instrument.write(f":SOUR:CURR:VLIM {config.v_limit}")
+        self.instrument_write(i_range_cmd)
+        self.instrument_write(":SENS:FUNC 'VOLT'")
+        self.instrument_write(v_range_cmd)
+        self.instrument_write(f":SENS:VOLT:NPLC {config.nplc}")
+        self.instrument_write(f":SOUR:CURR:LEV {config.i_out}")
+        self.instrument_write(f":SOUR:CURR:VLIM {config.v_limit}")
 
     def enable_4wire_mode(self,switch : bool = False) -> None:
         """启用 4-Wire 测量模式（不改变其他配置）"""
         if switch:
-            self.instrument.write(f":SYST:RSEN ON")  # 开启远程传感（4-Wire）
+            self.instrument_write(f":SYST:RSEN ON")  # 开启远程传感（4-Wire）
         else :
-            self.instrument.write(f":SYST:RSEN OFF")  # （2-Wire）
+            self.instrument_write(f":SYST:RSEN OFF")  # （2-Wire）
+
+    def voltage_measure_wait_stable(self,diff,interval):
+        '''
+        等待电压稳定，返回最后一次测量值
+        :param diff: 最大允许的电压误差  任何电压都被允许
+        :param interval: 采集电压的时间间隔
+        :return:
+        '''
+        history=[]
+
+        while 1:
+            now=time.perf_counter()
+            history.append((now,self.voltage_measure()))
+            if history[-1][0]-history[0][0]>interval:
+                meas_list=sorted([k[1] for k in history])
+                if meas_list[-1]-meas_list[0]<diff:
+                    break
+            expire=now-interval
+            history=[p for p in history if p[0]>expire]
+            # print(history)
+
+        return history[-1][1]
 
 
-    def current_measure(self) -> float :
-        meas_i = self.instrument.query('MEAS:CURR?')
+    def measure_current(self) -> float :
+        meas_i = self.instrument_query('MEAS:CURR?')
 
         return float(meas_i)
 
-    def voltage_measure(self) -> float :
-        meas_v = self.instrument.query('MEAS:CURR?')
+    def measuere_voltage(self) -> float :
+        meas_v = self.instrument_query('MEAS:VOLT?')
 
         return float(meas_v)
 
     def enable_output(self, switch : bool = False) -> None:
         if switch:
-            self.instrument.write(f":OUTP ON")
+            self.instrument_write(f":OUTP ON")
         else:
-            self.instrument.write(f":OUTP OFF")
+            self.instrument_write(f":OUTP OFF")
 
 
     def force_current_set(self,current : float = 0.0):
-        self.instrument.write(f":SOUR:CURR:LEV {current}")  # 设置强制输出电流值
+        self.instrument_write(f":SOUR:CURR:LEV {current}")  # 设置强制输出电流值
 
     def force_voltage_set(self,voltage : float = 0.0):
-        self.instrument.write(f":SOUR:VOLT {voltage}")
+        self.instrument_write(f":SOUR:VOLT {voltage}")
+
+
+    """ Below  are the functions which are not used very often, but may be useful in some cases."""
+    """ Below  are the functions which are not used very often, but may be useful in some cases."""
+    """ Below  are the functions which are not used very often, but may be useful in some cases."""
+
+    def enter
 
     def enter_local_mode(self):
-        self.instrument.write(":TRIG:CONT RESTart")  # make SMU return to local & enter continious mode
+        self.instrument_write(":TRIG:CONT RESTart")  # make SMU return to local & enter continious mode
+
+
 
 if __name__ == "__main__" :
     """
