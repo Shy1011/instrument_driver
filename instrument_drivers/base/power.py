@@ -18,8 +18,8 @@ class Power(Instrument):
         :param current:
         :return:
         """
-        self.instrument.write(f"SOUR{ch}:VOLT {vol}")
-        self.instrument.write(f"SOUR{ch}:CURR {current}")
+        self.instrument_write(f"SOUR{ch}:VOLT {vol}")
+        self.instrument_write(f"SOUR{ch}:CURR {current}")
 
 
     def turn_on_off(self,ch,switch):

@@ -11,7 +11,7 @@ Develop a generic function for SMU
 class ForceVoltSenseCurConfig:
     v_out: float | str = 0  # 电压源输出值（单位：V）
     i_limit: float | str = 1  # 电压源模式下的电流限值（单位：A）
-    v_range: float | str = "auto"  # 电压源量程，数值为具体量程，字符串表示自动量程
+    v_range: float | str = "auto"  # 电压源量程，数值为具体量程，字符串表示自动量程  可以在手册 p160 查阅到相关资料
     i_range: float | str = "auto"  # 电流测量量程，数值为具体量程，字符串表示自动量程
     nplc: float = 1  # 电流测量的积分时间（NPLC值）
 
@@ -131,6 +131,11 @@ class Smu(Instrument):
 
         return float(meas_v)
 
+    def measure_resistance(self) -> float :
+        meas_r = self.instrument_query(':MEASure:RESistance?')
+
+        return float(meas_r)
+
     def enable_output(self, switch : bool = False) -> None:
         if switch:
             self.instrument_write(f":OUTP ON")
@@ -143,13 +148,6 @@ class Smu(Instrument):
 
     def force_voltage_set(self,voltage : float = 0.0):
         self.instrument_write(f":SOUR:VOLT {voltage}")
-
-
-    """ Below  are the functions which are not used very often, but may be useful in some cases."""
-    """ Below  are the functions which are not used very often, but may be useful in some cases."""
-    """ Below  are the functions which are not used very often, but may be useful in some cases."""
-
-    def enter
 
     def enter_local_mode(self):
         self.instrument_write(":TRIG:CONT RESTart")  # make SMU return to local & enter continious mode

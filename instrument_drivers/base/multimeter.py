@@ -25,7 +25,7 @@ class Multimeter(Instrument):
             # 其他型号仅支持特定离散值
             return nplc in {0.02, 0.2, 1, 10, 100}
 
-    def dc_voltage_measure(self, range="10", resolution="0.0001") -> float:
+    def measure_dc_voltage(self, range="10", resolution="0.0001") -> float:
         """
         测量直流电压（自动跳过重复参数配置）
         Args:
@@ -38,24 +38,21 @@ class Multimeter(Instrument):
         assert range in {"0.1", "1", "10", "100", "1000", "AUTO"}, "Invalid range"
         assert resolution in {"0.001", "0.0001", "0.00001", "AUTO"}, "Invalid resolution"
 
-        # 检查参数是否变化
-        if range == self._last_voltage_range and resolution == self._last_voltage_resolution:
-            # 参数未变化，直接测量
-            res = self.instrument_query("MEASure:VOLTage:DC?")
-        else:
-            # 参数变化，更新配置并测量
-            if range == "AUTO" and resolution == "AUTO":
-                res = self.instrument_query("MEASure:VOLTage:DC?")
-            else:
-                res = self.instrument_query(f"MEASure:VOLTage:DC? {range},{resolution}")
 
-            # 更新缓存
-            self._last_voltage_range = range
-            self._last_voltage_resolution = resolution
+
+        # 参数变化，更新配置并测量
+        if range == "AUTO" and resolution == "AUTO":
+            res = self.instrument.query("MEASure:VOLTage:DC?")
+        else:
+            res = self.instrument.query(f"MEASure:VOLTage:DC? {range},{resolution}")
+
+        # 更新缓存
+        self._last_voltage_range = range
+        self._last_voltage_resolution = resolution
 
         return float(res)
 
-    def dc_current_measure(self, range="3", resolution="0.0001") -> float:
+    def measure_dc_current(self, range="3", resolution="0.0001") -> float:
         """
         测量直流电流（自动跳过重复参数配置）
 
@@ -70,24 +67,14 @@ class Multimeter(Instrument):
         assert range in {"0.1", "1", "3", "10", "100", "1000", "AUTO"}, "请选择正确的电流量程"
         assert resolution in {"0.001", "0.0001", "0.00001", "AUTO"}, "请选择正确的分辨率"
 
-        # 检查参数是否变化
-        if range == self._last_current_range and resolution == self._last_current_resolution:
-            # 参数未变化，直接测量
-            res = self.instrument_query("MEASure:CURRent:DC?")
+        if range == "AUTO" and resolution == "AUTO":
+            res = self.instrument.query("MEASure:CURRent:DC?")
         else:
-            # 参数有变化，更新配置
-            if range == "AUTO" and resolution == "AUTO":
-                res = self.instrument_query("MEASure:CURRent:DC?")
-            else:
-                res = self.instrument_query(f"MEASure:CURRent:DC? {range},{resolution}")
-
-            # 更新缓存
-            self._last_current_range = range
-            self._last_current_resolution = resolution
+            res = self.instrument.query(f"MEASure:CURRent:DC? {range},{resolution}")
 
         return float(res)
 
-    def fre_measure(self):
+    def measure_fre(self):
         res = self.instrument_query(f"MEASure:FREQuency?")
 
         return float(res)
@@ -102,14 +89,6 @@ class Multimeter(Instrument):
         res = self.instrument_query("read?")
         return float(res)
 
-    def buzzer_ring(self,times):
-        """
-        Makes buzzer beep once.
-        :return: none
-        """
-        for i  in range (times) :
-            self.instrument.write("SYST:BEEP:IMM")
-            time.sleep(0.5)
 
 
 
