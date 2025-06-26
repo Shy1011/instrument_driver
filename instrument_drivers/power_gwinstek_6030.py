@@ -12,7 +12,7 @@ class PowerGwinstek6030(Power) :
         :return: none
         """
 
-        self.instrument.write(f':OUTPut1:STATe {switch}')  # 开启输出
+        self.instrument_write(f':OUTPut{ch}:STATe {switch}')  # 开启输出
         time.sleep(1)
 
 
@@ -23,7 +23,7 @@ class PowerGwinstek6030(Power) :
         :return: float
         """
 
-        voltage = self.instrument.query(f":MEASure{str(ch)}:VOLTage?")
+        voltage = self.instrument_query(f":MEASure{str(ch)}:VOLTage?")
         return float(voltage)
 
     def read_current(self,ch):
@@ -31,7 +31,7 @@ class PowerGwinstek6030(Power) :
         :param ch: 1 / 2 / 3
         :return: float
         """
-        current = self.instrument.query(f":MEASure{str(ch)}:CURRent?")
+        current = self.instrument_query(f":MEASure{str(ch)}:CURRent?")
         return float(current)
 
     def read_power(self, ch):
@@ -40,7 +40,7 @@ class PowerGwinstek6030(Power) :
         :param ch: 1 / 2 /3
         :return: float
         """
-        power = self.instrument.query(f":MEASure{str(ch)}:POWer?")
+        power = self.instrument_query(f":MEASure{str(ch)}:POWer?")
         return float(power)
 
 if __name__ == "__main__":

@@ -142,6 +142,30 @@ class SmuKeithley2460(Smu):
     """ Digitial IO Settings """
     """ Digitial IO Settings """
 
+    def configure_digital_io_sepreately(self,port : int,direction : str,state:int):
+        """
+        P312 - 325
+        -  Digital open-drain, output,
+        - or input• Trigger open-drain, output,
+        - or input• Trigger synchronous master or acceptor
+        :param port: 1 - 6
+        :param direction: OUT/IN  Inpupt Mode :An attached device must be able to sink at least 50 µA from each I/O line.
+        50mA/33V 超过此范围会对IO口造成损坏
+        :param state: 1高电平 0低电平  高电平为 5V
+        :return:
+        """
+        self.instrument_write(f":DIGital:LINE{port}:MODE DIGital, {direction}")
+        self.instrument_write(f":DIGital:LINE{port}:STATe {state}")
+
+    def configure_all_digital_io(self,state:int):
+        """
+        P320
+        :param state:   0bxx__ ____ 低6位有效       1高电平 0低电平  高电平为 5V
+        :return:
+        """
+        self.instrument_write(f":DIGital:WRITe {state}")
+
+    # P321
 
 
 
